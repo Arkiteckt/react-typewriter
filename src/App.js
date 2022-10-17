@@ -111,26 +111,126 @@ const KeyboardGrid = (props) => {
 		]
   ];
 
-  const [keyRows, setKeyRows] = useState(keyBoardArr);
+  // const [keyRows, setKeyRows] = useState(keyBoardArr);
 
-  const deepClone = (object) =>{
+  // const deepClone = (object) =>{
    
-    return JSON.parse(JSON.stringify(object))
-  }
+  //   return JSON.parse(JSON.stringify(object))
+  // }
 
-  const handleKeyDown = (event) => {
-		console.log(event.key)
-    const copyArray = deepClone(keyRows)
-    console.log(copyArray);
-    // use .map to go through the array and select a key
-  };
+  // const [keyRows, setKeyRows] = useState(keyBoardArr);
+
+  // const handleKeyDown = (event) => {
+	// 	console.log(event.key)
+  //   const copyArray = deepClone(keyRows)
+  //   console.log(copyArray);
+  //   // use .map to go through the array and select a key
+  // };
 
   
-  const handleKeyUp = (event) => {
-		console.log(event.key)
-  };
+  // const handleKeyUp = (event) => {
+	// 	console.log(event.key)
+  // };
 
 	
+//   const ref = useRef(null);
+
+//   useEffect(() => {
+//     ref.current.focus();
+//   }, []);
+
+//   return (
+//     <div
+//       className="Keyboard-grid"
+//       ref={ref}
+//       tabIndex={-1}
+// 			onKeyDown={handleKeyDown}
+//       onKeyUp={handleKeyUp}
+//     >
+//     {keyRows.map((keyRow, index)=>{
+//       return <KeyboardRow keyRow={keyRow} key={index}/>
+//     })}
+//     </div>
+//   );
+// };
+//********Display the Keyboard***********
+// const KeyboardRow = (props) => {
+//   console.log(props)
+//   return (
+//     <div className="Keyboard-row">
+//       {props.keyRow.map((keyObject, index)=>{
+//         return <KeyboardKey keyObject = {keyObject} key= {index}/>
+//       })}
+//     </div>
+//   );
+// }
+
+// const KeyboardKey = (props) => {
+//   return (
+//     <div className = "Keyboard-key">
+//       {props.keyObject.letter}
+//     </div>
+//   )
+// }
+// export default App;
+
+
+
+
+//class review
+const [keyRows, setKeyRows] = useState(keyBoardArr);
+
+  const handleKeyDown = (event) => {
+    let keyRowsClone = [...keyRows];
+
+    keyRowsClone = keyRowsClone.map((keyRows) => {
+      //This will map through the keyRows arrays and return an updated version of the key row
+      const updatedKeyRow = keyRows.map((keyObject) => {
+        // If we do match the event key, we set isPressed to be true for just that key
+        if (event.key.toLowerCase() === keyObject.letter.toLowerCase()) {
+          textHandler(keyObject, "keyDown");
+          return {
+            ...keyObject,
+            isPressed: true,
+          };
+        }
+
+        // If we do not match the letter, we return just the normal key object
+        return keyObject;
+      });
+
+      return updatedKeyRow;
+    });
+
+    setKeyRows(keyRowsClone);
+  };
+
+  const handleKeyUp = (event) => {
+    let keyRowsClone = [...keyRows];
+
+    keyRowsClone = keyRowsClone.map((keyRows) => {
+      //This will map through the keyRows arrays and return an updated version of the key row
+      const updatedKeyRow = keyRows.map((keyObject) => {
+        // If we do match the event key, we set isPressed to be false for just that key
+        if (event.key.toLowerCase() === keyObject.letter.toLowerCase()) {
+          textHandler(keyObject, "keyUp");
+          return {
+            ...keyObject,
+            isPressed: false,
+          };
+        }
+
+        // If we do not match the letter, we return just the normal key object
+        return keyObject;
+      });
+
+      return updatedKeyRow;
+    });
+
+    setKeyRows(keyRowsClone);
+  };
+
+  /* The following lines for the useRef and useEffect are serving a single purpose for us, it is getting the div in the JSX of <KeyboardGrid/> and focusing it on page load.*/
   const ref = useRef(null);
 
   useEffect(() => {
@@ -142,33 +242,41 @@ const KeyboardGrid = (props) => {
       className="Keyboard-grid"
       ref={ref}
       tabIndex={-1}
-			onKeyDown={handleKeyDown}
+      onKeyDown={handleKeyDown}
       onKeyUp={handleKeyUp}
     >
-    {keyRows.map((keyRow, index)=>{
-      return <KeyboardRow keyRow={keyRow} key={index}/>
-    })}
-    </div>
-  );
-};
-//********Display the Keyboard***********
-const KeyboardRow = (props) => {
-  console.log(props)
-  return (
-    <div className="Keyboard-row">
-      {props.keyRow.map((keyObject, index)=>{
-        return <KeyboardKey keyObject = {keyObject} key= {index}/>
+      {keyRows.map((keyRow, index) => {
+        return <KeyboardRow keyRow={keyRow} key={index} />;
       })}
     </div>
   );
-}
+};
+
+const KeyboardRow = (props) => {
+  return (
+    <div className="Keyboard-row">
+      {props.keyRow.map((keyObject, index) => {
+        return <KeyboardKey keyObject={keyObject} key={index} />;
+      })}
+    </div>
+  );
+};
 
 const KeyboardKey = (props) => {
-  return (
-    <div className = "Keyboard-key">
-      {props.keyObject.letter}
-    </div>
-  )
-}
-export default App;
+  const { keyObject } = props;
+  const { letter, isPressed } = keyObject;
+  const keyClass = isPressed === true ? "pressed" : "released";
 
+  // let keyClass = ""
+  // if (isPressed === true) {
+  // 	keyClass = "pressed"
+  // } else {
+  // 	keyClass = "released"
+  // }
+
+  return (
+    <div className={`Keyboard-key ${keyClass}`}>{props.keyObject.letter}</div>
+  );
+};
+
+export default App;
